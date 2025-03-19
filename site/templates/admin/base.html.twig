@@ -6,7 +6,13 @@
     <title>{{ page_title|default('Blog') }}</title>
 
     <!-- Styles -->
-    {% block stylesheets %}
+    {% block stylesheets %}{% endblock %}
+
+    <!-- JS -->
+    {% block javascripts %}
+        {% block importmap %}
+            {{ importmap('app') }}
+        {% endblock %}
     {% endblock %}
 
     <meta name="theme-color" content="#fafafa" />
@@ -44,16 +50,8 @@
 
         <!-- Main -->
         <div class="p-4 md:ml-64 h-auto pt-20 flex-grow">
-            {% block body %}
-            {% endblock %}
+            {% block body %}{% endblock %}
         </div>
     </div>
-
-    <!-- JS -->
-    {% block javascripts %}
-        {% block importmap %}
-            {{ importmap('app') }}
-        {% endblock %}
-    {% endblock %}
 </body>
 </html>

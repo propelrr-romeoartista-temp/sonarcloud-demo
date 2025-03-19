@@ -1,0 +1,26 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block body %}
+    <section class="p-4 m-4 sm:p-5 ">
+        <div class="mx-auto max-w-screen px-4 lg:px-12">
+            <div class="relative shadow-md sm:rounded-lg overflow-hidden">
+                <div class="md:space-y-0 md:space-x-4 p-4">
+                    <div class="m-4 p-4 modal:m-0 modal:p-0 rounded-lg">
+                        <div class="flex justify-between">
+                            <h1 class="text-xl font-semibold mb-4">New User</h1>
+                            <div class="mr-4">
+                                <a href="{{ path('app_admin_users') }}" class="text-sm font-medium">Back to list</a>
+                                <div class="inline-block"></div>
+                            </div>
+                        </div>
+
+                        {{ form_start(form) }}
+                            {{ form_widget(form) }}
+                            <button formnovalidate class="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">{{ button_label|default('Save') }}</button>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

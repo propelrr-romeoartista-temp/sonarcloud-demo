@@ -2,8 +2,11 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\User;
+use App\Form\UserType;
 use App\Interface\UserServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
@@ -25,40 +28,59 @@ final class UserController extends AbstractController
     ): Response
     {
         $pager = $this->userService->findPaginated($query, $page, 10);
-        
+
         return $this->render('admin/users/index.html.twig', [
             'users' => $pager,
         ]);
     }
 
-    #[Route('/new', name: 'app_admin_users_new', methods: ['GET', 'POST'])]
-    public function new(
-        Request $request,
-        PmoServiceInterface $pmoService
-    ): Response
+    #[Route('/admin/users/new', name: 'app_admin_users_new', methods: ['GET', 'POST'])]
+    public function new(Request $request): Response
     {
-        $pmo = new Pmo();
-        $form  = $this->createPmoForm($pmo);
+        $user = new User();
+        $form  = $this->createUserForm($user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $pmoService->create($pmo);
-            $this->addFlash('success', 'PMO Created');
+            $this->userService->create($user);
+            $this->addFlash('success', 'User created');
 
-            if ($request->headers->has('turbo-frame')) {
-                $stream = $this->renderBlockView('admin/pages/pmo-directory/new.html.twig', 'stream_success', [
-                    'pmo' => $pmo
-                ]);
-
-                $this->addFlash('stream', $stream);
-            }
-
-            return $this->redirectToRoute('app_admin_pmo_directory_list', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_admin_users', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('admin/pages/pmo-directory/new.html.twig', [
-            'pmo' => $pmo,
+        return $this->render('admin/users/new.html.twig', [
+            'user' => $user,
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/admin/users/{id}/edit', name: 'app_admin_users_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, User $user): Response
+    {
+        $form  = $this->createUserForm($user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->userService->update($user);
+            $this->addFlash('success', 'User ' . $user->getUsername() . ' updated');
+
+            return $this->redirectToRoute('app_admin_users', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('admin/users/edit.html.twig', [
+            'user' => $user,
+            'form' => $form,
+        ]);
+    }
+
+    private function createUserForm(User $user = null): FormInterface
+    {
+        $user = $user ?? new User();
+
+        return $this->createForm(UserType::class, $user, [
+            'action' => $user->getId() ?
+                $this->generateUrl('app_admin_users_edit', ['id' => $user->getId()])
+                : $this->generateUrl('app_admin_users_new'),
         ]);
     }
 }
