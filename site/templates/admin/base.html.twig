@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ page_title|default('Blog') }}</title>
+
+    <!-- Styles -->
+    {% block stylesheets %}
+    {% endblock %}
+
+    <meta name="theme-color" content="#fafafa" />
+</head>
+<body>
+    <div class="antialiased">
+        <!-- Header -->
+        <div class="border-b border-gray-200 px-4 py-2.5 fixed left-0 right-0 top-0 z-50">
+            <div class="flex flex-wrap justify-between items-center">
+                <div class="flex justify-start items-center">
+                    <a href="{{ path('app_admin_dashboard') }}" class="flex items-center justify-between mr-4">
+                        <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Blog</span>
+                    </a>
+                </div>
+                <div class="flex items-center lg:order-2">
+                    <a href="{{ path('app_admin_logout') }}" class="flex mx-3 text-sm rounded-full md:mr-0 focus:ring-4">
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Side navigation -->
+        <div class="fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform -translate-x-full md:translate-x-0">
+            <div class="overflow-y-auto py-5 px-3 h-full">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="{{ path('app_admin_users') }}" class="flex items-center p-2 text-base font-medium text-white rounded-lg hover:bg-gray-500">
+                            <span class="ml-3">Users</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main -->
+        <div class="p-4 md:ml-64 h-auto pt-20 flex-grow">
+            {% block body %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- JS -->
+    {% block javascripts %}
+        {% block importmap %}
+            {{ importmap('app') }}
+        {% endblock %}
+    {% endblock %}
+</body>
+</html>

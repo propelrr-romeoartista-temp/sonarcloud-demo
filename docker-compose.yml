@@ -1,0 +1,64 @@
+version: "3.8"
+services:
+  demo-app:
+    build: docker/php
+    container_name: demo-app
+    working_dir: /var/www/site
+    volumes:
+      - ./site:/var/www/site
+      - ./docker/php/conf.d/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+      - demo-vendor-data:/var/www/site/vendor
+      - demo-var-data:/var/www/site/var
+    networks:
+      - demo-network
+  demo-nginx:
+    image: nginx:mainline-alpine-slim
+    container_name: demo-nginx
+    working_dir: /var/www/site
+    ports:
+      - "8090:80"
+    volumes:
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./site:/var/www/site:ro
+      - demo-vendor-data:/var/www/site/vendor:ro
+      - demo-var-data:/var/www/site/var:ro
+    networks:
+      - demo-network
+  demo-phpmyadmin:
+    ports:
+      - "8091:80"
+    container_name: demo-phpmyadmin
+    depends_on:
+      - demo-mysql
+    image: phpmyadmin
+    environment:
+      PMA_HOST: demo-mysql:3306
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      UPLOAD_LIMIT: 30000000000
+      MEMORY_LIMIT: 30000000000
+    networks:
+      - demo-network
+  demo-mysql:
+    image: mysql:latest
+    container_name: demo-mysql
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-db}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
+      - MYSQL_USER=${MYSQL_USER:-user}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-pass}
+    volumes:
+      - demo-db-data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    ports:
+      - "3311:3306"
+    networks:
+      - demo-network
+
+networks:
+  demo-network:
+    driver: bridge
+
+volumes:
+  demo-vendor-data:
+  demo-var-data:
+  demo-db-data:
